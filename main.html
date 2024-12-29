@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ESP32 Управление</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; }
+        header { background-color: #007BFF; color: white; text-align: center; padding: 10px 0; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        .sensor-card { display: flex; justify-content: space-between; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
+        button { padding: 10px 20px; font-size: 16px; color: white; background-color: #007BFF; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+    <script>
+        function toggleRelay() {
+            fetch('/toggleRelay')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('relayState').textContent = data.relayState ? 'Включено' : 'Выключено';
+                })
+                .catch(error => console.error('Ошибка переключения реле:', error));
+        }
+
+        function toggleFan() {
+            fetch('/toggleFan')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('fanState').textContent = data.fanState ? 'Включено' : 'Выключено';
+                })
+                .catch(error => console.error('Ошибка переключения кулера:', error));
+        }
+
+        function updateData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature').textContent = data.temperature + ' °C';
+                    document.getElementById('humidity').textContent = data.humidity + ' %';
+                    document.getElementById('soilMoisture').textContent = data.soil_moisture + ' %';
+                    document.getElementById('relayState').textContent = data.relayState ? 'Включено' : 'Выключено';
+                    document.getElementById('fanState').textContent = data.fanState ? 'Включено' : 'Выключено';
+                })
+                .catch(error => console.error('Ошибка обновления данных:', error));
+        }
+
+        setInterval(updateData, 5000);
+        window.onload = updateData;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>ESP32 Панель управления</h1>
+    </header>
+    <div class="container">
+        <div class="sensor-card">
+            <div>
+                <p>Температура: <span id="temperature">--</span></p>
+                <p>Влажность: <span id="humidity">--</span></p>
+                <p>Влажность почвы: <span id="soilMoisture">--</span></p>
+            </div>
+        </div>
+        <div class="sensor-card">
+            <div>Состояние реле: <span id="relayState">--</span></div>
+            <button onclick="toggleRelay()">Переключить реле</button>
+        </div>
+        <div class="sensor-card">
+            <div>Состояние кулера: <span id="fanState">--</span></div>
+            <button onclick="toggleFan()">Переключить кулер</button>
+        </div>
+    </div>
+</body>
+</html>
